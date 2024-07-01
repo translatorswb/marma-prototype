@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive UI Prototype</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .top-panel {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .top-panel button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .text-box-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .text-box-container input {
+            width: 300px;
+            padding: 10px 70px 10px 10px; /* Adjust padding to make room for the buttons */
+            font-size: 16px;
+        }
+        .delete-button {
+            position: absolute;
+            right: 45px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: #000;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .delete-button i {
+            font-size: 20px;
+            color: #000;
+        }
+        .play-button {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #000;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .play-button i {
+            font-size: 24px;
+            color: #000;
+        }
+        .sentences-box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .sentence-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .sentence-container div {
+            width: 250px;
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .sentence-play-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #000;
+        }
+        .large-play-button {
+            background: #007BFF;
+            border: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            font-size: 24px;
+            color: #fff;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .large-play-button i {
+            font-size: 24px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-panel">
+        <!-- Burmese alphabet buttons -->
+        <script>
+            const burmeseAlphabet = 'ကခဂဃငစဆဇဈညဋဌဍဎဏတထဒဓနပဖဗဘမယရလဝသဟဠအ';
+            burmeseAlphabet.split('').forEach(letter => {
+                document.write(`<button onclick="appendLetter('${letter}')">${letter}</button>`);
+            });
+
+            function appendLetter(letter) {
+                document.getElementById('text-box').value += letter;
+            }
+        </script>
+    </div>
+
+    <div class="text-box-container">
+        <input type="text" id="text-box" placeholder="Text will appear here">
+        <button class="delete-button" onclick="clearTextBox()">
+            <i class="fa-solid fa-delete-left"></i>
+        </button>
+        <button class="play-button" onclick="alert('Playing: ' + document.getElementById('text-box').value)">
+            <i class="fas fa-play"></i>
+        </button>
+    </div>
+
+    <div class="sentences-box">
+        <!-- Sentence containers with non-editable divs and play buttons -->
+        <div class="sentence-container">
+            <div onclick="splitWords(event)" data-split="false">Over the wintry</div>
+            <button class="sentence-play-button" onclick="alert('Playing: Over the wintry')">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+        <div class="sentence-container">
+            <div onclick="splitWords(event)" data-split="false">forest, winds howl in rage</div>
+            <button class="sentence-play-button" onclick="alert('Playing: forest, winds howl in rage')">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+        <div class="sentence-container">
+            <div onclick="splitWords(event)" data-split="false">with no leaves to blow.</div>
+            <button class="sentence-play-button" onclick="alert('Playing: with no leaves to blow')">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+    </div>
+
+    <button class="large-play-button" onclick="alert('Playing all sentences')">
+        <i class="fa-regular fa-circle-play"></i> Play All
+    </button>
+
+    <script>
+        function loadWord(word) {
+            document.getElementById('text-box').value = word;
+        }
+
+        function clearTextBox() {
+            document.getElementById('text-box').value = '';
+        }
+
+        function splitWords(event) {
+            const target = event.target;
+            // Check if the sentence is already split
+            if (target.getAttribute('data-split') === 'true') return;
+
+            const sentence = target.innerText.trim().split(/\s+/); // Split by whitespace and trim extra spaces
+            console.log("Original sentence:", target.innerText);
+            console.log("Split words:", sentence);
+
+            target.innerHTML = '';
+            sentence.forEach((word, index) => {
+                const wordSpan = document.createElement('span');
+                wordSpan.innerText = word;
+                wordSpan.style.cursor = 'pointer';
+                wordSpan.onclick = () => loadWord(word);
+                target.appendChild(wordSpan);
+                if (index < sentence.length - 1) {
+                    target.appendChild(document.createTextNode(' ')); // Add a space between words
+                }
+            });
+
+            // Mark the sentence as split to prevent re-splitting
+            target.setAttribute('data-split', 'true');
+        }
+    </script>
+</body>
+</html>
