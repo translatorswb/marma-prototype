@@ -5,124 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive UI Prototype</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-        }
-        .top-panel {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 20px;
-            max-width: 600px; /* Adjust max-width for the alphabet buttons */
-        }
-        .top-panel button {
-            margin: 5px;
-            padding: 10px;
-            font-size: 16px;
-        }
-        .text-box-container {
-            display: flex;
-            align-items: center;
-            position: relative;
-            margin-bottom: 40px;
-        }
-        .text-box-container input {
-            width: 300px;
-            padding: 10px 70px 10px 10px; /* Adjust padding to make room for the buttons */
-            font-size: 16px;
-        }
-        .delete-button {
-            position: absolute;
-            right: 45px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            color: #000;
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
-        .delete-button i {
-            font-size: 20px;
-            color: #000;
-        }
-        .play-button {
-            position: absolute;
-            right: 10px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            color: #000;
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
-        .play-button i {
-            font-size: 24px;
-            color: #000;
-        }
-        .sentences-box {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            width: 30%; /* Make the sentence boxes wider */
-        }
-        .sentence-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .sentence-container div {
-            width: calc(100% - 50px); /* Adjust width of sentence text */
-            padding: 10px;
-            font-size: 16px;
-            margin-right: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .sentence-play-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            color: #000;
-            margin-left: auto; /* Ensure the play button aligns to the right */
-            display: flex;
-            align-items: center;
-        }
-        .large-play-button {
-            background: #007BFF;
-            border: none;
-            cursor: pointer;
-            padding: 10px 20px;
-            font-size: 24px;
-            color: #fff;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        .large-play-button i {
-            font-size: 24px;
-            color: #fff;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="top-panel">
@@ -149,15 +32,27 @@
         </button>
     </div>
 
+    <!-- Tabbed interface -->
+    <div class="tabs">
+        <button id="tab-button-1" class="tab-button active" onclick="showTabContent('tab1', 'content/content1')">Content 1</button>
+        <button id="tab-button-2" class="tab-button" onclick="showTabContent('tab2', 'content/content2')">Content 2</button>
+    </div>
+
     <button class="large-play-button" onclick="playAllSentences()">
         <i class="fa-regular fa-circle-play"></i> Play All
     </button>
 
-    <div class="sentences-box" id="sentences-box">
-        <!-- Sentence containers will be populated here by JavaScript -->
+    <div id="tab1" class="tab-content active">
+        <div class="sentences-box" id="sentences-box-tab1">
+            <!-- Sentence containers will be populated here by JavaScript -->
+        </div>
     </div>
 
-    
+    <div id="tab2" class="tab-content">
+        <div class="sentences-box" id="sentences-box-tab2">
+            <!-- Sentence containers will be populated here by JavaScript -->
+        </div>
+    </div>
 
     <script>
         function loadWord(word) {
@@ -194,19 +89,65 @@
         }
 
         function playAllSentences() {
-            const audio = new Audio('marma_poem.mp3');
+            const audio = new Audio(currentContent.fullAudio);
             audio.play();
         }
 
-        // Load the poem lines and create sentence containers
-        async function loadPoem() {
-            const response = await fetch('marma_poem.txt');
-            const text = await response.text();
-            const lines = text.trim().split('\n');
+        function showTabContent(tabId, contentDir) {
+            const tabs = document.getElementsByClassName('tab-button');
+            const contents = document.getElementsByClassName('tab-content');
 
-            const sentencesBox = document.getElementById('sentences-box');
+            for (let tab of tabs) {
+                tab.classList.remove('active');
+            }
+            for (let content of contents) {
+                content.classList.remove('active');
+            }
 
-            lines.forEach((line, index) => {
+            document.querySelector(`.tab-button[onclick="showTabContent('${tabId}', '${contentDir}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            loadContent(contentDir, `sentences-box-${tabId}`, tabId);
+        }
+
+        async function loadContent(contentDir, boxId, tabId) {
+            try {
+                const titleResponse = await fetch(`${contentDir}/title.txt`);
+                const titleText = await titleResponse.text();
+                document.querySelector(`#tab-button-${tabId.slice(-1)}`).innerText = titleText.trim();
+
+                const contentResponse = await fetch(`${contentDir}/content.txt`);
+                const contentText = await contentResponse.text();
+
+                const segments = [];
+                for (let i = 1; i <= contentText.trim().split('\n').length; i++) {
+                    segments.push(`${contentDir}/segments/${i}.mp3`);
+                }
+
+                const fullAudio = `${contentDir}/full_audio.mp3`;
+
+                updateUI(contentText.trim().split('\n'), segments, fullAudio, boxId);
+            } catch (error) {
+                console.error('Error loading content:', error);
+                document.getElementById(boxId).innerHTML = '<p>Error loading content. Please check the console for more details.</p>';
+            }
+        }
+
+        async function loadTabTitles() {
+            const tab1TitleResponse = await fetch('content/content1/title.txt');
+            const tab1TitleText = await tab1TitleResponse.text();
+            document.querySelector('#tab-button-1').innerText = tab1TitleText.trim();
+
+            const tab2TitleResponse = await fetch('content/content2/title.txt');
+            const tab2TitleText = await tab2TitleResponse.text();
+            document.querySelector('#tab-button-2').innerText = tab2TitleText.trim();
+        }
+
+        function updateUI(contentLines, segments, fullAudio, boxId) {
+            const sentencesBox = document.getElementById(boxId);
+            sentencesBox.innerHTML = '';
+
+            contentLines.forEach((line, index) => {
                 const sentenceContainer = document.createElement('div');
                 sentenceContainer.className = 'sentence-container';
 
@@ -219,16 +160,27 @@
                 playButton.className = 'sentence-play-button';
                 playButton.innerHTML = '<i class="fas fa-play"></i>';
                 playButton.onclick = () => {
-                    const audio = new Audio(`poem_segments/marma_poem_${index + 1}.mp3`);
+                    const audio = new Audio(segments[index]);
                     audio.play();
                 };
                 sentenceContainer.appendChild(playButton);
 
                 sentencesBox.appendChild(sentenceContainer);
             });
+
+            currentContent = { contentLines, segments, fullAudio };
         }
 
-        window.onload = loadPoem;
+        let currentContent = {
+            contentLines: [],
+            segments: [],
+            fullAudio: ''
+        };
+
+        window.onload = async () => {
+            await loadTabTitles(); // Load the titles for both tabs
+            showTabContent('tab1', 'content/content1'); // Display the first tab content
+        };
     </script>
 </body>
 </html>
