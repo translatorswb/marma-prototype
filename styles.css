@@ -17,9 +17,26 @@ body {
     max-width: 600px; /* Adjust max-width for the alphabet buttons */
 }
 
+.alphabet-buttons, .diacritic-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 10px;
+    max-width: 600px; 
+}
+
 .top-panel button {
     margin: 5px;
     padding: 10px;
+    font-size: 16px;
+}
+
+button.diacritic {
+    background-color: #d0e0f0; /* Different background color for diacritic buttons */
+    color: #000;
+    border: 1px solid #ccc;
+    margin: 5px; /* Consistent margin with alphabet buttons */
+    padding: 10px; /* Consistent padding with alphabet buttons */
     font-size: 16px;
 }
 

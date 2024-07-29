@@ -9,17 +9,38 @@
 </head>
 <body>
     <div class="top-panel">
-        <!-- Burmese alphabet buttons -->
-        <script>
-            const burmeseAlphabet = 'ကခဂဃငစဆဇဈညဋဌဍဎဏတထဒဓနပဖဗဘမယရလဝသဟဠအ';
-            burmeseAlphabet.split('').forEach(letter => {
-                document.write(`<button onclick="appendLetter('${letter}')">${letter}</button>`);
-            });
+        <!-- Marma alphabet buttons -->
+        <div class="alphabet-buttons">
+            <script>
+                const marmaAlphabet = 'ကဣဤခဂဃငစဆဇဈညဋဌဍဎဏတထဒဓနပဖဗဘမယရလဝသဟဠအဧ';
+                marmaAlphabet.split('').forEach(letter => {
+                    document.write(`<button onclick="appendLetter('${letter}')">${letter}</button>`);
+                });
+            </script>
+        </div>
 
-            function appendLetter(letter) {
-                document.getElementById('text-box').value += letter;
-            }
-        </script>
+        <!-- Diacritic marks buttons -->
+        <div class="diacritic-buttons">
+            <script>
+                const diacriticMarks = 'ျြွှ';
+                diacriticMarks.split('').forEach(mark => {
+                    document.write(`<button class="diacritic" onclick="appendDiacritic('${mark}')">${mark}</button>`);
+                });
+
+                function appendLetter(letter) {
+                    document.getElementById('text-box').value += letter;
+                }
+
+                function appendDiacritic(mark) {
+                    const textBox = document.getElementById('text-box');
+                    if (textBox.value) {
+                        textBox.value += mark;
+                    } else {
+                        textBox.value += mark;
+                    }
+                }
+            </script>
+        </div>
     </div>
 
     <div class="text-box-container">
